@@ -15,7 +15,7 @@ lifx = Lifx()
 
 
 def eink(version):
-    os.system("./eink.sh {}{}.bmp".format(app.config.get('image'), version))
+    os.system("./eink.sh pic/{}{}.bmp".format(app.config.get('image'), version))
 
 
 @app.route("/")
@@ -129,7 +129,16 @@ def tilt():
         return 'Bad Gateway', 502
 
 
+@app.route('/eink/clear', methods=['POST'])
+def clear():
+    try:
+        os.system("./eink.sh")
+        return 'ok', 200
+    except:
+        return 'Bad Gateway', 502
+
+
 if __name__ == "__main__":
     app.config['image'] = sys.argv[1]
     # app.run(host="192.168.0.13", port=8080, debug=True)
-    app.run(host="127.0.0.1", port=8080, debug=True)
+    app.run(host="192.168.1.33", port=8080, debug=True)
