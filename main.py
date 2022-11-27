@@ -1,4 +1,5 @@
 import csv
+import os
 import sys
 import time
 
@@ -13,9 +14,15 @@ app = Flask(__name__)
 lifx = Lifx()
 
 
+def eink(version):
+    os.system("./eink.sh {}{}.bmp".format(app.config.get('image'), version))
+
+
 @app.route("/")
 def index():
-    return "Server up and running with {!r}".format(app.config.get('image')), 200
+    image = app.config.get('image')
+    eink(75)
+    return "Server up and running with {}".format(image), 200
 
 
 @app.route('/frame', methods=['PUT'])
@@ -92,6 +99,32 @@ def brightness():
 def get_power():
     try:
         return lifx.power_state(), 200
+    except:
+        return 'Bad Gateway', 502
+
+
+@app.route('/eink/size', methods=['POST'])
+def size():
+    try:
+        value = request.args.get('value', default=0, type=int)
+        if value == 25 or value == 50 or value == 75:
+            eink(value)
+            return 'ok', 200
+        else:
+            return 'Invalid Size', 400
+    except:
+        return 'Bad Gateway', 502
+
+
+@app.route('/eink/tilt', methods=['POST'])
+def tilt():
+    try:
+        value = request.args.get('value', default=0, type=int)
+        if value == 0 or value == 30 or value == 60:
+            eink(75 if value == 0 else value)
+            return 'ok', 200
+        else:
+            return 'Invalid Tilt', 400
     except:
         return 'Bad Gateway', 502
 
