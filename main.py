@@ -15,7 +15,7 @@ lifx = Lifx()
 
 
 def eink(version):
-    os.system("./eink.sh pic/{}{}.bmp".format(app.config.get('image'), version))
+    os.system("./eink.sh img/{}{}.bmp".format(app.config.get('image'), version))
 
 
 @app.route("/")
