@@ -1,5 +1,3 @@
-import time
-
 from lifxlan import LifxLAN
 
 lifx = LifxLAN(1)
@@ -20,7 +18,8 @@ class Lifx:
         Turns off all lights
         :return: None
         """
-        lifx.set_power_all_lights("off", rapid=True)
+        lifxlan = LifxLAN()
+        lifxlan.set_power_all_lights("off", rapid=True)
 
     def power_state(self):
         """
@@ -40,7 +39,6 @@ class Lifx:
         devices = lifx.get_lights()
         for device in devices:
             device.set_brightness(brightness, rapid=True)
-        time.sleep(0.5)
 
     def get_brightness(self):
         return self.bright
