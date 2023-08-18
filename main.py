@@ -2,6 +2,7 @@ import csv
 import os
 import sys
 import time
+from threading import Thread
 
 import cv2
 import numpy as np
@@ -15,7 +16,7 @@ app = Flask(__name__)
 lifx = Lifx()
 current = 0
 valid_distance = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-valid_angles = [0, 15, 30, 45, 60, 75, 90]
+valid_angles = [0, 15, 30, 45, 60, 75]
 
 
 def eink(version):
@@ -95,7 +96,8 @@ def size():
     try:
         value = request.args.get('value', default=0, type=int)
         if value in valid_distance:
-            eink(value)
+            thread = Thread(target=eink, kwargs={'version': value})
+            thread.start()
             return 'ok', 200
         else:
             return 'Invalid Size', 400
@@ -105,10 +107,14 @@ def size():
 
 @app.route('/eink/tilt', methods=['POST'])
 def tilt():
+    def thread_tilt(angle):
+        eink(7 if angle == 0 else 0 if angle == 90 else angle)
+
     try:
         value = request.args.get('value', default=0, type=int)
         if value in valid_angles:
-            eink(7 if value == 0 else 0 if value == 90 else value)
+            thread = Thread(target=thread_tilt, kwargs={'angle': value})
+            thread.start()
             return 'ok', 200
         else:
             return 'Invalid Tilt', 400
@@ -118,8 +124,12 @@ def tilt():
 
 @app.route('/eink/clear', methods=['POST'])
 def clear():
-    try:
+    def thread_clear():
         os.system("./eink.sh")
+
+    try:
+        thread = Thread(target=thread_clear)
+        thread.start()
         return 'ok', 200
     except:
         return 'Bad Gateway', 502
@@ -128,6 +138,6 @@ def clear():
 if __name__ == "__main__":
     app.config['image'] = sys.argv[1]
     # app.run(host="192.168.0.13", port=8080, debug=True)
-    # app.run(host="192.168.1.34", port=8080, debug=True)
-    app.run(host="192.168.1.33", port=8080, debug=True)
+    # app.run(host="192.168.1.33", port=8080, debug=True)
+    app.run(host="192.168.1.34", port=8080, debug=True)
     # app.run(port=8080, debug=True)

@@ -55,5 +55,5 @@ class Lifx:
 
 
 if __name__ == "__main__":
-    lifx = Lifx()
-    lifx.set_brightness(2500)
+    lifx_ = Lifx()
+    lifx_.set_brightness(2500)
